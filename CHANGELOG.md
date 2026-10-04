@@ -4,7 +4,23 @@ All notable changes to Stash Android Player are documented here.
 
 When bumping `versionName`, add a new section for the release version and summarize the changes since the previous version. The public release workflow uses the matching section for GitHub Release notes.
 
-## [Unreleased]
+## [1.12.2] - 2026-10-04
+
+### English
+
+- Show cropped Stash sprite thumbnails while scrubbing the timeline or seeking by drag in watch-page and fullscreen playback, with time-only fallback when previews are unavailable.
+
+### 한국어
+
+- 시청 페이지와 전체화면에서 타임라인 또는 드래그 탐색 중 Stash 스프라이트 썸네일을 표시하며, 미리보기가 없으면 시간 정보를 유지합니다.
+
+### 简体中文
+
+- 在观看页和全屏播放中拖动时间轴或滑动定位时显示 Stash 精灵图缩略图；预览不可用时保留时间信息。
+
+### 繁體中文
+
+- 在觀看頁及全螢幕播放中拖曳時間軸或滑動定位時顯示 Stash 精靈圖縮圖；預覽無法使用時保留時間資訊。
 
 ## [1.12.1] - 2026-10-02
 

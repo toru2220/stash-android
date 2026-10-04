@@ -36,21 +36,34 @@ fun parseStashSpriteVtt(vttUrl: String, vtt: String): List<StashSpriteFrame> {
 
         val text = lines.drop(index + 1).firstOrNull { it.isNotBlank() }.orEmpty()
         val spriteMatch = SPRITE_CUE_REGEX.matchEntire(text)
-        if (spriteMatch != null) {
-            frames += StashSpriteFrame(
-                url = resolveSpriteUrl(vttUrl, spriteMatch.groupValues[1]),
-                startSeconds = startSeconds,
-                endSeconds = endSeconds,
-                x = spriteMatch.groupValues[2].toInt(),
-                y = spriteMatch.groupValues[3].toInt(),
-                width = spriteMatch.groupValues[4].toInt(),
-                height = spriteMatch.groupValues[5].toInt(),
-            )
+        if (spriteMatch != null && startSeconds.isFinite() && endSeconds.isFinite() &&
+            startSeconds >= 0.0 && endSeconds > startSeconds
+        ) {
+            val dimensions = spriteMatch.groupValues.drop(2).map { it.toIntOrNull() }
+            val x = dimensions[0]
+            val y = dimensions[1]
+            val width = dimensions[2]
+            val height = dimensions[3]
+            if (x != null && y != null && width != null && height != null && width > 0 && height > 0) {
+                frames += StashSpriteFrame(
+                    url = resolveSpriteUrl(vttUrl, spriteMatch.groupValues[1]),
+                    startSeconds = startSeconds,
+                    endSeconds = endSeconds,
+                    x = x,
+                    y = y,
+                    width = width,
+                    height = height,
+                )
+            }
         }
         index += 1
     }
     return frames.sortedBy { it.startSeconds }
 }
+
+fun StashSpriteFrame.fitsSpriteSheet(sheetWidth: Int, sheetHeight: Int): Boolean =
+    x >= 0 && y >= 0 && width > 0 && height > 0 &&
+        x.toLong() + width <= sheetWidth && y.toLong() + height <= sheetHeight
 
 fun findStashSpriteAtTime(frames: List<StashSpriteFrame>?, seconds: Double): StashSpriteFrame? {
     if (frames.isNullOrEmpty() || !seconds.isFinite()) return null

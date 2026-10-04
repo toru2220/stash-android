@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
+import coil.ImageLoader
+import okhttp3.OkHttpClient
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -224,6 +228,16 @@ fun PlayerOverlay(
     onPlayerGestureSuspendedByModalSurfaceChanged: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val spriteImageLoader = remember(context) {
+        ImageLoader.Builder(context)
+            // A redirect must never carry Stash headers/query credentials to another origin.
+            .okHttpClient { OkHttpClient.Builder().followRedirects(false).followSslRedirects(false).build() }
+            .build()
+    }
+    DisposableEffect(spriteImageLoader) {
+        onDispose { spriteImageLoader.shutdown() }
+    }
     val playbackFraction = if (durationMs > 0L) {
         (positionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f)
     } else {
@@ -374,6 +388,9 @@ fun PlayerOverlay(
             if (timelineState.visible) {
                 PlayerSeekPreviewTimelineCard(
                     state = timelineState,
+                    frame = preview.frame,
+                    serverProfile = serverProfile,
+                    imageLoader = spriteImageLoader,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .navigationBarsPadding()
@@ -499,6 +516,9 @@ fun PlayerOverlay(
 @Composable
 private fun PlayerSeekPreviewTimelineCard(
     state: PlayerSeekPreviewTimelineUiState,
+    frame: StashSpriteFrame?,
+    serverProfile: StashServerProfile?,
+    imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -518,21 +538,27 @@ private fun PlayerSeekPreviewTimelineCard(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = state.deltaLabel,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = StashColors.Primary,
-                )
-                Text(
-                    text = "${state.targetLabel} / ${state.durationLabel}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = StashColors.TextPrimary,
-                    fontWeight = FontWeight.Medium,
-                )
+                frame?.let { PlayerSpriteThumbnail(it, serverProfile, imageLoader) }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    Text(
+                        text = state.deltaLabel,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = StashColors.Primary,
+                    )
+                    Text(
+                        text = "${state.targetLabel} / ${state.durationLabel}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = StashColors.TextPrimary,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
             }
             Box(
                 modifier = Modifier

@@ -99,7 +99,9 @@ The Images tab supports search, sort, filters, and full-screen browsing. In the 
 3. Open the APK and allow installs from your browser or file manager if Android asks.
 4. Launch **Stash Player** and connect it to your Stash server.
 
-Current public release: **v1.12.1**
+Current public release: **v1.12.2**
+
+Timeline and horizontal-drag seeking show cropped Stash sprite previews in watch-page and fullscreen playback, with time information retained when previews are unavailable.
 
 ## Requirements
 
