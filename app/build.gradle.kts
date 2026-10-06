@@ -57,7 +57,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "gomeng.dev.stashplayer"
+        applicationId = "toru2220.dev.stashplayer"
         minSdk = 29
         targetSdk = 35
         versionCode = 56
